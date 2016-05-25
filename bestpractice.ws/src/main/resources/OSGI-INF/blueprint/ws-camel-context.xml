@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws" xmlns:cxf="http://cxf.apache.org/blueprint/core"
+	xmlns:camel="http://camel.apache.org/schema/blueprint" xmlns:camelcxf="http://camel.apache.org/schema/blueprint/cxf"
+	xsi:schemaLocation=" 
+      http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd 
+      http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd 
+      http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd ">
+
+	<cm:property-placeholder id="props"
+		persistent-id="com.redhat.bestpractice.ws" placeholder-prefix="$("
+		placeholder-suffix=")" />
+
+	<camelcxf:cxfEndpoint id="accountServiceEndpoint"
+		address="http://localhost:9090/bestpractice/account" serviceClass="com.redhat.fusebyexample.bestpractice.account.Account" />
+
+	<camelContext trace="true" id="rh.bp.ws"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<errorHandler type="DeadLetterChannel" deadLetterUri="mock:error"
+			level="ERROR" id="errorHandler">
+			<redeliveryPolicy maximumRedeliveries="{{bestpractice.retry.count}}"
+				redeliveryDelay="{{bestpractice.retry.delay}}"
+				maximumRedeliveryDelay="{{bestpractice.retry.maxdelay}}"
+				retryAttemptedLogLevel="WARN" logStackTrace="true" logHandled="true" />
+		</errorHandler>
+
+		<onException>
+			<exception>java.lang.Exception</exception>
+			<redeliveryPolicy maximumRedeliveries="{{bestpractice.retry.count}}"
+				redeliveryDelay="{{bestpractice.retry.delay}}"
+				maximumRedeliveryDelay="{{bestpractice.retry.maxdelay}}"
+				retryAttemptedLogLevel="WARN" logStackTrace="true" logHandled="true" />
+			<handled>
+				<constant>true</constant>
+			</handled>
+			<to uri="mock:error" />
+		</onException>
+
+		<route id="rh.bp.ws.account.InboundRoute">
+			<from uri="cxf:bean:accountServiceEndpoint" />
+			<transform>
+				<simple>${in.body[0]}</simple>
+			</transform>
+			<marshal>
+				<jaxb contextPath="com.redhat.fusebyexample.bestpractice.account.types" />
+			</marshal>
+			<log logName="account-service-ws" message="request = ${body}" />
+			<to uri="{{bestpractice.ws.endpoint}}" />
+			<unmarshal>
+				<jaxb contextPath="com.redhat.fusebyexample.bestpractice.account.types" />
+			</unmarshal>
+		</route>
+
+	</camelContext>
+
+</blueprint>  

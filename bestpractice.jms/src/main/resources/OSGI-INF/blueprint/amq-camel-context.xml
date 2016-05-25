@@ -1,0 +1,73 @@
+<blueprint
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:camel="http://camel.apache.org/schema/blueprint"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:amq="http://activemq.apache.org/schema/core"
+    xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+    <cm:property-placeholder
+        id="props"
+        persistent-id="com.redhat.bestpractice.jms"
+        placeholder-prefix="$("
+        placeholder-suffix=")" />
+
+    <bean
+        id="activemq"
+        class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property
+            name="brokerURL"
+            value="$(bestpractice.jms.url):$(bestpractice.jms.port)" />
+        <property
+            name="userName"
+            value="$(bestpractice.jms.username)" />
+        <property
+            name="password"
+            value="$(bestpractice.jms.password)" />
+    </bean>
+
+    <camelContext
+        trace="true"
+        id="rh.bp.jms"
+        xmlns="http://camel.apache.org/schema/blueprint">
+
+        <errorHandler
+            type="DeadLetterChannel"
+            deadLetterUri="mock:error"
+            level="ERROR"
+            id="errorHandler">
+            <redeliveryPolicy
+                maximumRedeliveries="{{bestpractice.retry.count}}"
+                redeliveryDelay="{{bestpractice.retry.delay}}"
+                maximumRedeliveryDelay="{{bestpractice.retry.maxdelay}}"
+                retryAttemptedLogLevel="WARN"
+                logStackTrace="true"
+                logHandled="true" />
+        </errorHandler>
+
+        <onException>
+            <exception>java.lang.Exception</exception>
+            <redeliveryPolicy
+                maximumRedeliveries="{{bestpractice.retry.count}}"
+                redeliveryDelay="{{bestpractice.retry.delay}}"
+                maximumRedeliveryDelay="{{bestpractice.retry.maxdelay}}"
+                retryAttemptedLogLevel="WARN"
+                logStackTrace="true"
+                logHandled="true" />
+            <handled>
+                <constant>true</constant>
+            </handled>
+            <to uri="mock:error" />
+        </onException>
+
+        <route id="rh.bp.jms.account.InboundRoute">
+            <from uri="activemq:{{bestpractice.jms.dest}}" />
+            <log
+                logName="account-service-jms"
+                message="request = ${body}" />
+            <to uri="{{bestpractice.core.endpoint}}" />
+        </route>
+
+    </camelContext>
+
+</blueprint>

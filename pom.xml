@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.redhat</groupId>
+    <artifactId>bestpractice.parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>Best Practice :: Parent</name>
+
+    <url>https://jboss.org</url>
+
+    <organization>
+        <name>JBoss Fuse</name>
+        <url>http://jboss.org</url>
+    </organization>
+
+    <scm>
+        <connection>scm:git@githost:best-practice-archetype.git</connection>
+        <url>scm:git@githost:best-practice-archetype.git</url>
+        <developerConnection>scm:git@githost:best-practice-archetype.git</developerConnection>
+    </scm>
+
+    <!-- 
+        Profiles allow for tailored build processes.  By default, the settings.xml
+        asserts the development profile as active.  The development profile does
+        not execute the itest project by default, in order to save time building.
+      
+        Developers should activate the itest profile and perform integration
+        test before committing the code, as Jenkins uses the itest profile during
+        its build process.
+    -->
+    <profiles>
+        <profile>
+            <id>development</id>
+            <modules>
+                <module>bestpractice.entities</module>
+                <module>bestpractice.ws</module>
+                <module>bestpractice.jms</module>
+                <module>bestpractice.core</module>
+                <module>bestpractice.client</module>
+                <module>bestpractice.feature</module>
+                <!-- <module>bestpractice.itest</module> -->
+            </modules>
+        </profile>
+
+        <profile>
+            <id>itest</id>
+            <modules>
+                <module>bestpractice.entities</module>
+                <module>bestpractice.ws</module>
+                <module>bestpractice.jms</module>
+                <module>bestpractice.core</module>
+                <module>bestpractice.client</module>
+                <module>bestpractice.feature</module>
+                <module>bestpractice.itest</module>
+            </modules>
+        </profile>
+
+    </profiles>
+
+    <developers>
+        <developer>
+            <id>developer</id>
+            <name>Software Developer</name>
+            <email>swdeveloper@jboss.org</email>
+            <organization>JBoss Fuse</organization>
+            <organizationUrl>http://jboss.org</organizationUrl>
+            <roles>
+                <role>sw</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <compiler.source.version>1.8</compiler.source.version>
+        <compiler.target.version>1.8</compiler.target.version>
+    
+        <!-- JBoss Fuse Properties -->
+        <jboss.fuse.bom.version>6.2.0.redhat-133</jboss.fuse.bom.version>
+        <jboss.fuse.install>6.2.0.redhat-133</jboss.fuse.install>
+
+        <!-- 
+            Versions pulled from JBoss Fuse BOM for Dependency Management. 
+        -->
+        <cxf-version>3.0.4.redhat-620133</cxf-version>
+        <camel-version>2.15.1.redhat-620133</camel-version>
+        <activemq-version>5.11.0.redhat-620133</activemq-version>
+        <karaf-version>2.4.0.redhat-620133</karaf-version>
+        <junit-version>4.11</junit-version>
+        <log4j-version>1.2.17</log4j-version>
+    
+        <!-- Testing Properties -->
+
+        
+        <!-- Explicitly overriding BOM's 2.3.1 version -->
+        <!-- <pax-exam-version>2.3.1</pax-exam-version> -->
+        <pax-exam-version>2.6.0</pax-exam-version>
+        <paxexam-karaf-container-version>1.0.0</paxexam-karaf-container-version>
+        <pax-runner-version>1.6.1</pax-runner-version>
+        <pax-tiny-bundle-version>1.3.1</pax-tiny-bundle-version>
+        <pax-logging-version>1.6.10</pax-logging-version>
+
+        <!-- For Plugin Versions -->
+        <maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
+        <build.helper.plugin.version>1.7</build.helper.plugin.version>
+        <felix.bundle.plugin.version>2.3.7</felix.bundle.plugin.version>
+        <lifecycle.mapping.version>1.0.0</lifecycle.mapping.version>
+        <maven-failsafe-plugin.version>2.8.1</maven-failsafe-plugin.version>
+        <depends-maven-plugin.version>1.2</depends-maven-plugin.version>
+    
+        <!-- For Pax Exam -->
+        <serviceHTTPPortForIntegrationTest>8182</serviceHTTPPortForIntegrationTest>
+
+    </properties>
+
+    <dependencyManagement>
+
+        <dependencies>
+    
+            <!-- Application Project Dependency Management -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bestpractice.entities</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bestpractice.ws</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bestpractice.jms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bestpractice.core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+      
+            <!-- Import Fuse Dependency Management via BOM -->
+            <dependency>
+                <groupId>org.jboss.fuse.bom</groupId>
+                <artifactId>jboss-fuse-parent</artifactId>
+                <version>${jboss.fuse.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Pax Exam Dependency Management -->
+
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam</artifactId>
+                <version>${pax-exam-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-junit4</artifactId>
+                <version>${pax-exam-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.runner</groupId>
+                <artifactId>pax-runner-no-jcl</artifactId>
+                <version>${pax-runner-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.swissbox</groupId>
+                <artifactId>pax-swissbox-tinybundles</artifactId>
+                <version>${pax-tiny-bundle-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openengsb.labs.paxexam.karaf</groupId>
+                <artifactId>paxexam-karaf-container</artifactId>
+                <version>${paxexam-karaf-container-version}</version>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${compiler.source.version}</source>
+                    <target>${compiler.target.version}</target>
+                </configuration>
+            </plugin>
+            
+            <!-- 
+                This plug-in sets a system property needed to make
+                PAX Exam work right per custom environment. Refer 
+                to the definition of the 
+                "org.ops4j.pax.url.mvn.repositories" property
+                in the properties section of this POM for more info. 
+            -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>set-system-properties</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>org.ops4j.pax.url.mvn.repositories</name>
+                                    <value>${org.ops4j.pax.url.mvn.repositories}</value>
+                                </property>
+
+                                <property>
+                                    <name>repositoryLocation</name>
+                                    <value>${settings.localRepository}</value>
+                                </property>
+
+                                <property>
+                                    <name>serviceProductHTTPPort</name>
+                                    <value>${serviceHTTPPortForIntegrationTest}</value>
+                                </property>
+
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-codegen-plugin</artifactId>
+                    <version>${cxf-version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build.helper.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <extensions>true</extensions>
+                    <version>${felix.bundle.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.camel</groupId>
+                    <artifactId>camel-maven-plugin</artifactId>
+                    <version>${camel-version}</version>
+                </plugin>
+      
+                <!--
+                    This plugin's configuration is used to store Eclipse m2e settings only. 
+                    It has no influence on the Maven build itself.
+                -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>${lifecycle.mapping.version}</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.cxf</groupId>
+                                        <artifactId>cxf-codegen-plugin</artifactId>
+                                        <versionRange>[2.5.0.fuse-7-061,)</versionRange>
+                                        <goals>
+                                            <goal>wsdl2java</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.servicemix.tooling</groupId>
+                                        <artifactId>depends-maven-plugin</artifactId>
+                                        <versionRange>[1.2,)</versionRange>
+                                        <goals>
+                                            <goal>generate-depends-file</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>properties-maven-plugin</artifactId>
+                                        <versionRange>[1.0-alpha-2,)</versionRange>
+                                        <goals>
+                                            <goal>set-system-properties</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+<!--                 <plugin> -->
+<!--                     <groupId>org.apache.servicemix.tooling</groupId> -->
+<!--                     <artifactId>depends-maven-plugin</artifactId> -->
+<!--                     <version>${depends-maven-plugin.version}</version> -->
+<!--                     <executions> -->
+<!--                         <execution> -->
+<!--                             <id>generate-depends-file</id> -->
+<!--                             <phase>generate-resources</phase> -->
+<!--                             <goals> -->
+<!--                                 <goal>generate-depends-file</goal> -->
+<!--                             </goals> -->
+<!--                         </execution> -->
+<!--                     </executions> -->
+<!--                 </plugin> -->
+
+                <plugin>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>exam-maven-plugin</artifactId>
+                    <version>${pax.exam.version}</version>
+                    <configuration>
+                        <configClass>${pax.configuration.class}</configClass>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>start-container</goal>
+                                <goal>stop-container</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0-alpha-2</version>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+    </build>
+
+    <repositories>
+        <repository>
+            <id>jboss.releases</id>
+            <name>JBoss Fuse Release Repository</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/fs-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss.ea</id>
+            <name>JBoss Fuse Early Access Release Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/ea/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jboss.releases</id>
+            <name>JBoss Fuse Release Repository</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/fs-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss.ea</id>
+            <name>JBoss Fuse Early Access Release Repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/ea/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <modules>
+        <module>bestpractice.client</module>
+        <module>bestpractice.core</module>
+        <module>bestpractice.entities</module>
+        <module>bestpractice.feature</module>
+        <!-- <module>bestpractice.itest</module> -->
+        <module>bestpractice.jms</module>
+        <module>bestpractice.ws</module>
+    </modules>
+</project>

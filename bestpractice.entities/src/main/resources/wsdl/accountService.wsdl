@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    name="account"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tns="http://fusebyexample.redhat.com/bestpractice/account"
+    xmlns:typens="http://fusebyexample.redhat.com/bestpractice/account/types"
+    targetNamespace="http://fusebyexample.redhat.com/bestpractice/account">
+
+    <wsdl:types>
+        <xsd:schema
+            targetNamespace="http://fusebyexample.redhat.com/bestpractice/account/types"
+            elementFormDefault="qualified">
+            <xsd:element name="accountRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element
+                            name="accountId"
+                            type="xsd:string" />
+                        <xsd:element
+                            name="accountType"
+                            type="xsd:string" />
+                        <xsd:element
+                            name="applicationId"
+                            type="xsd:string" />
+                        <xsd:element
+                            name="bankName"
+                            type="xsd:string" />
+                        <xsd:element
+                            name="bankRoutingNumber"
+                            type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="accountResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element
+                            name="reply"
+                            type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="AccountRequest">
+        <wsdl:part
+            name="payload"
+            element="typens:accountRequest" />
+    </wsdl:message>
+
+    <wsdl:message name="AccountResponse">
+        <wsdl:part
+            name="response"
+            element="typens:accountResponse" />
+    </wsdl:message>
+
+    <wsdl:portType name="Account">
+        <wsdl:operation name="createAccount">
+            <wsdl:input message="tns:AccountRequest" />
+            <wsdl:output message="tns:AccountResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding
+        name="AccountSOAPBinding"
+        type="tns:Account">
+        <soap:binding
+            style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="createAccount">
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="AccountService">
+        <wsdl:port
+            binding="tns:AccountSOAPBinding"
+            name="AccountPort">
+            <soap:address location="http://localhost:9090/bestpractice/account" />
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>

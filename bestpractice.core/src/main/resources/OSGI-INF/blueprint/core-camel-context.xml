@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:camel="http://camel.apache.org/schema/blueprint"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=" 
+      http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd 
+      http://cxf.apache.org/schemas/blueprint/core.xsd ">
+
+    <cm:property-placeholder
+        id="props"
+        persistent-id="com.redhat.bestpractice.core" />
+
+    <bean
+        id="accountServiceProcessor"
+        class="com.redhat.bestpractice.account.impl.AccountImpl"
+        init-method="init" />
+
+    <camelContext
+        trace="true"
+        id="rh.bp.core"
+        xmlns="http://camel.apache.org/schema/blueprint">
+
+        <route id="rh.bp.core.account.Route">
+            <from uri="{{bestpractice.core.endpoint}}" />
+            <log
+                logName="account-service-core"
+                message="account = ${body}" />
+            <unmarshal>
+                <jaxb contextPath="com.redhat.fusebyexample.bestpractice.account.types" />
+            </unmarshal>
+            <!--  
+                In this example, processing is handled in a bean.
+                This can be replaced with calls to other web services.
+            -->
+            <bean ref="accountServiceProcessor" />
+            <marshal>
+                <jaxb contextPath="com.redhat.fusebyexample.bestpractice.account.types" />
+            </marshal>
+        </route>
+
+    </camelContext>
+
+</blueprint>  
